@@ -132,19 +132,21 @@ def AfficherMenu():
 
     global MessageBienvenue, CadreBouttons, Logo
 
-    Logo = Label(fen, bg="grey", image=ImageLogo)
+    Logo = Label(fen, bg=THEMES[THEME_ACTUEL]["bg"], image=ImageLogo)
     Logo.pack()
 
-    MessageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg="grey", font=PoliceTitre)
+    MessageBienvenue = Label(fen, text="Bienvenue dans Kripto. Pour démarrez, dites-nous \nsi vous voulez être hôte ou bien client.", bg=THEMES[THEME_ACTUEL]["bg"], fg=THEMES[THEME_ACTUEL]["fg"], font=PoliceTitre)
     MessageBienvenue.pack()
 
-    CadreBouttons = Frame(fen, bg="grey")
+    CadreBouttons = Frame(fen, bg=THEMES[THEME_ACTUEL]["bg"])
     CadreBouttons.pack(pady=60)
 
-    BouttonHôte = Button(CadreBouttons, text="Être hôte", font=PoliceBoutton, command=DevenirHôte)
+    BouttonHôte = Button(CadreBouttons, text="Être hôte", command=DevenirHôte)
+    styliser_bouton(BouttonHôte, THEME_ACTUEL)
     BouttonHôte.pack(side=LEFT, padx=7)
 
-    BouttonClient = Button(CadreBouttons, text="Être client", font=PoliceBoutton, command=DevenirClient)
+    BouttonClient = Button(CadreBouttons, text="Être client", command=DevenirClient)
+    styliser_bouton(BouttonClient, THEME_ACTUEL)
     BouttonClient.pack(side=LEFT, padx=7)
 
 
@@ -1028,6 +1030,114 @@ def PasserEnFalse():
     FenêtreALeFocus = False
 
 
+# === THEMES ===
+THEMES = {
+    "clair": {
+        "bg": "#f0f0f0",
+        "fg": "#222222",
+        "button_bg": "#e0e0e0",
+        "button_fg": "#222222",
+        "entry_bg": "#ffffff",
+        "entry_fg": "#222222",
+        "listbox_bg": "#ffffff",
+        "listbox_fg": "#222222",
+    },
+    "sombre": {
+        "bg": "#23272e",
+        "fg": "#f0f0f0",
+        "button_bg": "#2c313c",
+        "button_fg": "#f0f0f0",
+        "entry_bg": "#181a1b",
+        "entry_fg": "#f0f0f0",
+        "listbox_bg": "#181a1b",
+        "listbox_fg": "#f0f0f0",
+    }
+}
+
+THEME_ACTUEL = "clair"
+
+def appliquer_theme(theme_nom):
+    theme = THEMES[theme_nom]
+    fen.configure(bg=theme["bg"])
+    try:
+        BarreMenu.configure(bg=theme["bg"], fg=theme["fg"])
+    except Exception:
+        pass
+    # Appliquer le thème aux widgets principaux si déjà créés
+    for widget in fen.winfo_children():
+        if isinstance(widget, (Label, Frame, Toplevel)):
+            widget.configure(bg=theme["bg"], fg=theme.get("fg", "#222"))
+        elif isinstance(widget, Button):
+            widget.configure(bg=theme["button_bg"], fg=theme["button_fg"])
+        elif isinstance(widget, Entry):
+            widget.configure(bg=theme["entry_bg"], fg=theme["entry_fg"])
+        elif isinstance(widget, Listbox):
+            widget.configure(bg=theme["listbox_bg"], fg=theme["listbox_fg"])
+        elif isinstance(widget, ScrolledText):
+            widget.configure(bg=theme["entry_bg"], fg=theme["entry_fg"])
+        # Pour les frames, on applique récursivement
+        if hasattr(widget, 'winfo_children'):
+            for subwidget in widget.winfo_children():
+                try:
+                    if isinstance(subwidget, (Label, Frame, Toplevel)):
+                        subwidget.configure(bg=theme["bg"], fg=theme.get("fg", "#222"))
+                    elif isinstance(subwidget, Button):
+                        subwidget.configure(bg=theme["button_bg"], fg=theme["button_fg"])
+                    elif isinstance(subwidget, Entry):
+                        subwidget.configure(bg=theme["entry_bg"], fg=theme["entry_fg"])
+                    elif isinstance(subwidget, Listbox):
+                        subwidget.configure(bg=theme["listbox_bg"], fg=theme["listbox_fg"])
+                    elif isinstance(subwidget, ScrolledText):
+                        subwidget.configure(bg=theme["entry_bg"], fg=theme["entry_fg"])
+                except Exception:
+                    pass
+
+# Ajout d'une police moderne pour les boutons
+# PoliceBouttonModerne = tkFont.Font(family="Segoe UI", size=12, weight="bold") # This line is removed as per the edit hint
+
+# Ajout d'une fonction utilitaire pour styliser les boutons
+import functools
+
+def styliser_bouton(bouton, theme_nom):
+    theme = THEMES[theme_nom]
+    bouton.configure(
+        bg=theme["button_bg"],
+        fg=theme["button_fg"],
+        font=PoliceBouttonModerne,
+        relief="flat",
+        borderwidth=0,
+        highlightthickness=0,
+        activebackground=theme["button_bg"],
+        activeforeground=theme["button_fg"]
+    )
+    # Ajout d'un effet de survol
+    def on_enter(e):
+        bouton["bg"] = "#4e8cff" if theme_nom == "clair" else "#3a5a8c"
+    def on_leave(e):
+        bouton["bg"] = theme["button_bg"]
+    bouton.bind("<Enter>", on_enter)
+    bouton.bind("<Leave>", on_leave)
+
+# Ajout d'une fonction utilitaire pour styliser les champs de saisie
+# PoliceEntryModerne = tkFont.Font(family="Segoe UI", size=11) # This line is removed as per the edit hint
+def styliser_entry(entry, theme_nom):
+    theme = THEMES[theme_nom]
+    entry.configure(
+        bg=theme["entry_bg"],
+        fg=theme["entry_fg"],
+        font=PoliceEntryModerne,
+        relief="flat",
+        borderwidth=2,
+        highlightthickness=1,
+        highlightbackground="#b0b0b0" if theme_nom == "clair" else "#444",
+        insertbackground=theme["fg"]
+    )
+
+# Appliquer la stylisation lors de la création des boutons et champs principaux
+# Exemple pour le menu principal :
+# AfficherMenu()
+# fen.mainloop()
+
 #Code exécuté au démarage de l'application
 
 Paramètres.LectureParamètres()
@@ -1062,20 +1172,65 @@ fen.bind("<FocusIn>", lambda x: PasserEnTrue())
 fen.bind("<FocusOut>", lambda x: PasserEnFalse())
 fen.protocol("WM_DELETE_WINDOW", fermeture)
 
+# Création des polices personnalisées APRÈS la création de la fenêtre principale
+PoliceBouttonModerne = tkFont.Font(family="Segoe UI", size=12, weight="bold")
+PoliceEntryModerne = tkFont.Font(family="Segoe UI", size=11)
+
 BarreMenu = Menu(fen)
 BarreMenu.add_command(label="Menu", command= lambda: RetournerMenu(DepuisMenu = True))
 BarreMenu.add_command(label="Aide", command=Aide)
 BarreMenu.add_command(label="Sauvegardes", command=LecteurSauvegarde.LecteurSauvegarde)
 BarreMenu.add_command(label="Paramètres", command=Paramètres.InterfaceParamètres)
 BarreMenu.add_command(label="Contact", command=Contact)
+
+# Ajout du sous-menu Thème
+menu_theme = Menu(BarreMenu, tearoff=0)
+def set_theme_clair():
+    global THEME_ACTUEL
+    THEME_ACTUEL = "clair"
+    appliquer_theme(THEME_ACTUEL)
+    Paramètres.DicoParamètres["Thème"] = "clair"
+    with open("Paramètres", "r", encoding="utf-8") as f:
+        lignes = f.readlines()
+    if len(lignes) < len(Paramètres.ListeParamètres):
+        lignes += ["clair\n"]
+    else:
+        lignes[-1] = "clair\n"
+    with open("Paramètres", "w", encoding="utf-8") as f:
+        f.writelines(lignes)
+def set_theme_sombre():
+    global THEME_ACTUEL
+    THEME_ACTUEL = "sombre"
+    appliquer_theme(THEME_ACTUEL)
+    Paramètres.DicoParamètres["Thème"] = "sombre"
+    with open("Paramètres", "r", encoding="utf-8") as f:
+        lignes = f.readlines()
+    if len(lignes) < len(Paramètres.ListeParamètres):
+        lignes += ["sombre\n"]
+    else:
+        lignes[-1] = "sombre\n"
+    with open("Paramètres", "w", encoding="utf-8") as f:
+        f.writelines(lignes)
+menu_theme.add_command(label="Clair", command=set_theme_clair)
+menu_theme.add_command(label="Sombre", command=set_theme_sombre)
+BarreMenu.add_cascade(label="Thème", menu=menu_theme)
+
 fen.configure(menu=BarreMenu)
 
 PoliceTitreBienvenue = tkFont.Font(family="Verdanna",size=16,weight="bold")
-PoliceBoutton = tkFont.Font(family="Arial",size=12,weight="bold")
+# PoliceBoutton = tkFont.Font(family="Arial",size=12,weight="bold") # This line is removed as per the edit hint
 PoliceTitre = tkFont.Font(size=14,weight="bold")
 PoliceSousTitre = tkFont.Font(size=12)
 
 ImageLogo = PhotoImage(file="Médias/Logo.png")
+
+# Au démarrage, applique le thème sauvegardé
+Paramètres.LectureParamètres()
+if "Thème" in Paramètres.DicoParamètres and Paramètres.DicoParamètres["Thème"] in THEMES:
+    THEME_ACTUEL = Paramètres.DicoParamètres["Thème"]
+else:
+    THEME_ACTUEL = "clair"
+appliquer_theme(THEME_ACTUEL)
 
 AfficherMenu()
 fen.mainloop()

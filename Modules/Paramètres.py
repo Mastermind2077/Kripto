@@ -10,7 +10,7 @@ from tkinter import filedialog
 from tkinter import messagebox
 
 
-ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax", "MotDePasse", "Notification"]
+ListeParamètres = ["NomUserDéfaut", "Sauvegarde", "PortPréféré", "SonEnvoi", "SonRéception", "NombreUsersMax", "MotDePasse", "Notification", "Thème"]
 DicoParamètres = {}
 
 
